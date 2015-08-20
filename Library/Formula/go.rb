@@ -1,10 +1,9 @@
 class Go < Formula
   desc "Go programming environment"
   homepage "https://golang.org"
-  url "https://storage.googleapis.com/golang/go1.4.2.src.tar.gz"
-  mirror "https://fossies.org/linux/misc/go1.4.2.src.tar.gz"
-  version "1.4.2"
-  sha256 "299a6fd8f8adfdce15bc06bde926e7b252ae8e24dd5b16b7d8791ed79e7b5e9b"
+  url "https://storage.googleapis.com/golang/go1.5.src.tar.gz"
+  version "1.5"
+  sha256 "be81abec996d5126c05f2d36facc8e58a94d9183a56f026fc9441401d80062db"
 
   head "https://github.com/golang/go.git"
 
@@ -13,12 +12,6 @@ class Go < Formula
     sha256 "bb8b8e79201d93eb69e77763535b201ea812d426e259f106e18f62ddf80f86dd" => :yosemite
     sha256 "46fbe85b2c75e45686ee463eeaa975ce1604f04ee611815d7c163f5feee90e03" => :mavericks
     sha256 "7913ecbc952e22f9d6e5df114b857ed23ad97adcbc88419fa3b6425b856ee38e" => :mountain_lion
-  end
-
-  devel do
-    url "https://storage.googleapis.com/golang/go1.5rc1.src.tar.gz"
-    version "1.5rc1"
-    sha256 "c00c4762f70658ce1a7a06322ac1909d38fafca3b016ab20e62fffedcf09f9e4"
   end
 
   option "with-cc-all", "Build with cross-compilers and runtime support for all supported platforms"
@@ -69,19 +62,17 @@ class Go < Formula
       targets = [["darwin", [""]]]
     end
 
-    if build.head? || build.devel?
-      # GOROOT_FINAL must be overidden later on real Go install
-      ENV["GOROOT_FINAL"] = buildpath/"gobootstrap"
+    # GOROOT_FINAL must be overidden later on real Go install
+    ENV["GOROOT_FINAL"] = buildpath/"gobootstrap"
 
-      # build the gobootstrap toolchain Go >=1.4
-      (buildpath/"gobootstrap").install resource("gobootstrap")
-      cd "#{buildpath}/gobootstrap/src" do
-        system "./make.bash", "--no-clean"
-      end
-      # This should happen after we build the test Go, just in case
-      # the bootstrap toolchain is aware of this variable too.
-      ENV["GOROOT_BOOTSTRAP"] = ENV["GOROOT_FINAL"]
+    # build the gobootstrap toolchain Go >=1.4
+    (buildpath/"gobootstrap").install resource("gobootstrap")
+    cd "#{buildpath}/gobootstrap/src" do
+      system "./make.bash", "--no-clean"
     end
+    # This should happen after we build the test Go, just in case
+    # the bootstrap toolchain is aware of this variable too.
+    ENV["GOROOT_BOOTSTRAP"] = ENV["GOROOT_FINAL"]
 
     cd "src" do
       targets.each do |os, archs|
